@@ -84,7 +84,7 @@ userController.updateUser = async (req, res, next) => {
 };
 
 // verify user route to give information to state in the redux store
-userController.getUser = async (req, res, next) => {
+userController.verifyUser = async (req, res, next) => {
   const { user_id } = req.body;
   const _id = user_id;
   console.log(req.body);
