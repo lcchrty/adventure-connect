@@ -65,6 +65,7 @@ userController.createNewUser = async (req, res, next) => {
 
 userController.updateUser = async (req, res, next) => {
   try {
+    // need to update route for userID not cookies
     const { email } = req.cookies.currentEmail;
     const updatedUser = await User.findOneAndUpdate({ email }, req.body, {
       new: true,
@@ -83,9 +84,10 @@ userController.updateUser = async (req, res, next) => {
 };
 
 // verify user route to give information to state in the redux store
-userController.verifyUser = async (req, res, next) => {
+userController.getUser = async (req, res, next) => {
   const { user_id } = req.body;
   const _id = user_id;
+  console.log(req.body);
 
   try {
     const user = await User.findOne({ _id });

@@ -1,7 +1,6 @@
 import axios from "axios";
 const API_URL_SIGNUP = "/api/signup";
 const API_URL_LOGIN = "/api/login";
-
 const API_URL_USER = "/api/user";
 
 // register user
