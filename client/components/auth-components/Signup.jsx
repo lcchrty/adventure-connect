@@ -70,9 +70,7 @@ const list = [
 ];
 
 const Signup = () => {
-  const { user, isLoading, isSuccess, isError, message } = useSelector(
-    (state) => state.auth
-  );
+  const { user, user_id } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -84,17 +82,6 @@ const Signup = () => {
   const [zipcode, setZipcode] = useState("");
   const [bio, setBio] = useState("");
   const [error, setError] = useState("");
-
-  useEffect(() => {
-    //if there is an error we want to send an error message
-    if (isError) alert(message);
-    dispatch(reset());
-    // if sign up is successful (re: stgate updating) we want to send them on their way to dashboard
-    if (isSuccess || user) {
-      navigate("/dashboard");
-    }
-    dispatch(reset());
-  }, [user, isError, isSuccess, navigate, dispatch]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -123,8 +110,16 @@ const Signup = () => {
     }
     // error handling needs to be updated -Chandler
 
-    dispatch(register(userInfo));
-    navigate("/dashboard");
+    dispatch(register(userInfo))
+      .unwrap()
+      .then(() => {
+        navigate("dashboard");
+      })
+      .catch(() =>
+        setLoginError(
+          "We encountered an error while creating your account. Please try again later."
+        )
+      );
 
     // try {
     //   // const res = await axios.post("/api/signup", userInfo);
