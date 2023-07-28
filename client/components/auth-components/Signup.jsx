@@ -110,16 +110,9 @@ const Signup = () => {
     }
     // error handling needs to be updated -Chandler
 
-    dispatch(register(userInfo))
-      .unwrap()
-      .then(() => {
-        navigate("dashboard");
-      })
-      .catch(() =>
-        setLoginError(
-          "We encountered an error while creating your account. Please try again later."
-        )
-      );
+    dispatch(register(userInfo));
+    navigate("/dashboard");
+
     // try {
     //   // const res = await axios.post("/api/signup", userInfo);
     //   // navigate("/imageupload", { state: { email: email } });
