@@ -110,6 +110,7 @@ const Signup = () => {
     }
     // error handling needs to be updated -Chandler
 
+
     dispatch(register(userInfo))
       .unwrap()
       .then(() => {
@@ -119,7 +120,6 @@ const Signup = () => {
         setLoginError(
           "We encountered an error while creating your account. Please try again later."
         )
-      );
 
     // try {
     //   // const res = await axios.post("/api/signup", userInfo);
