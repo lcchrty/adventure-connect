@@ -4,3 +4,4 @@ __tests__
 .vscode
 dist
 .babelrc
+server/campfire-connect-f14e32ca020a.json

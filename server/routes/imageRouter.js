@@ -5,7 +5,7 @@ const Images = require("../models/imageModel");
 const bcrypt = require("bcrypt");
 
 router.get("/getImages", imageController.getImages, async (req, res) => {
-  console.log("req.params; ", req.params);
+  // console.log("req.params; ", req.params);
   res.status(200).json([[res.locals.images]]);
 });
 
