@@ -79,12 +79,12 @@ imageController.uploadImages = async (req, res, next) => {
 };
 
 imageController.getImages = async (req, res, next) => {
-  console.log("req.params: ", req.params);
-  const user_id = req.params.user_id;
+  console.log("req.params ", req.query);
+  const { user_id } = req.query;
   try {
     const image = await Images.find({ user_id: user_id });
-    // console.log('image',image[0].image);
-    res.locals.images = image;
+    console.log("image", image);
+    res.locals.image = image;
     return next();
   } catch (err) {
     console.log(err);

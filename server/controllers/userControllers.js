@@ -1,9 +1,6 @@
 const { createErr } = require("../utils/errorCreator");
-// const Images = require("../models/imageModel");
 require("dotenv").config();
 const bcrypt = require("bcrypt");
-
-// const { Storage } = require("@google-cloud/storage");
 const { format } = require("util");
 const multer = require("multer");
 const nodemailer = require("nodemailer");
@@ -11,15 +8,6 @@ const nodemailer = require("nodemailer");
 const User = require("../models/userModel");
 
 const userController = {};
-
-// const cloudStorage = new Storage({
-//   keyFilename: `${__dirname}/../web-app-adventure-connect-39d349a3f0d5.json`,
-//   projectId: "web-app-adventure-connect",
-// });
-// const bucketName = "adventure-connect-image-bucket";
-// const bucket = cloudStorage.bucket(bucketName);
-
-//verifying user upon logging in, to be put in route for post to /api/login. if route is successful, redirect to show user page
 
 userController.verifyLogin = async (req, res, next) => {
   const { email, password } = req.body;
@@ -87,7 +75,7 @@ userController.updateUser = async (req, res, next) => {
 userController.verifyUser = async (req, res, next) => {
   const { user_id } = req.body;
   const _id = user_id;
-  console.log(req.body);
+  // console.log(req.body);
 
   try {
     const user = await User.findOne({ _id });
