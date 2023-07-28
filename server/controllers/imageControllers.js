@@ -3,10 +3,11 @@ require("dotenv").config();
 const { createErr } = require("../utils/errorCreator");
 const Images = require("../models/imageModel");
 const User = require("../models/userModel");
-
 const { Storage } = require("@google-cloud/storage");
 const { format } = require("util");
 const multer = require("multer");
+const path = require("path");
+
 const nodemailer = require("nodemailer");
 
 /*
@@ -16,15 +17,15 @@ const nodemailer = require("nodemailer");
 */
 
 const cloudStorage = new Storage({
-  keyFilename: `${__dirname}/../web-app-adventure-connect-39d349a3f0d5.json`,
-  projectId: "	campfire-connect",
+  keyFilename: path.join(__dirname, "../campfire-connect-f14e32ca020a.json"),
+  projectId: "campfire-connect",
 });
-const bucketName = "bucket_adventure-connect";
+const bucketName = process.env.GCLOUD_STORAGE_BUCKET;
 const bucket = cloudStorage.bucket(bucketName);
 
 const imageController = {};
 
-imageController.uploadImages = (req, res) => {
+imageController.uploadImages = async (req, res, next) => {
   const upload = multer({
     storage: multer.memoryStorage(),
     limits: {
@@ -41,7 +42,7 @@ imageController.uploadImages = (req, res) => {
       console.log(err);
       return res.status(500).json({ message: "Error uploading Files" });
     }
-    const email = req.params.userEmail;
+    const user_id = req.params.user_id;
     console.log(req.file);
     if (!req.files) {
       res.status(400).send("No file uploaded.");
@@ -60,23 +61,28 @@ imageController.uploadImages = (req, res) => {
           const publicUrl = format(
             `https://storage.googleapis.com/${bucket.name}/${blob.name}`
           );
-          Images.create({ email: email, image: publicUrl });
+          console.log("publicUrl: ", publicUrl);
+          const imageUrls = await Images.create({
+            user_id: user_id,
+            image: publicUrl,
+          });
+          res.locals.images = imageUrls;
         });
         // urls.push(publicUrl);
         blobStream.end(file.buffer);
       });
-      res.status(200).send("Images uploaded");
+      return next();
     } catch (err) {
-      res.status(500).send("Error uploading images");
+      return next(err);
     }
   });
 };
 
 imageController.getImages = async (req, res, next) => {
   console.log("req.params: ", req.params);
-  const email = req.params.userEmail;
+  const user_id = req.params.user_id;
   try {
-    const image = await Images.find({ email: email });
+    const image = await Images.find({ user_id: user_id });
     // console.log('image',image[0].image);
     res.locals.images = image;
     return next();

@@ -5,15 +5,15 @@ const Images = require("../models/imageModel");
 const bcrypt = require("bcrypt");
 
 router.get("/getImages", imageController.getImages, async (req, res) => {
-  console.log("req.params; ", re.params);
+  console.log("req.params; ", req.params);
   res.status(200).json([[res.locals.images]]);
 });
 
 router.post(
-  "/upload-file-to-cloud-storage/:userEmail",
+  "/upload-file-to-cloud-storage/:user_id",
   imageController.uploadImages,
   async (req, res, next) => {
-    res.status(200);
+    res.status(200).send([res.locals.images]);
   }
 );
 

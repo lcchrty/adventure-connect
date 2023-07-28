@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useCookies } from "react-cookie";
 import { useNavigate, useLocation } from "react-router";
+import axios from "axios";
 
 function ImageUpload() {
   const [cookies, setCookie] = useCookies();
@@ -14,30 +15,25 @@ function ImageUpload() {
 
   // console.log(cookies.currentEmail);
 
-  console.log(JSON.parse(localStorage.getItem("user"))[0]);
+  console.log(JSON.parse(localStorage.getItem("user_id")));
 
   //current saved in an array on local storage > look at how is it saved in action -CC
-  const currentUser = JSON.parse(localStorage.getItem("user"))[0];
+  const user_id = JSON.parse(localStorage.getItem("user_id"));
 
-  const showImg = async () => {
-    try {
-      const data = await fetch(`/api/images/getImages`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        params: currentUser.email,
-      });
-      const json = await data.json();
-      const images = [];
-      json.forEach((image) => {
-        images.push(<img src={image.image}></img>);
-      });
-      setImages(images);
-    } catch (err) {
-      return err;
-    }
-  };
+  // const showImg = async () => {
+  //   try {
+  //     const data = await axios.get(`/api/images/getImages`, user_id);
+  //     const json = await data.json();
+  //     const images = [];
+  //     json.forEach((image, i) => {
+  //       images.push(<img key={`img-${i}`} src={image.image}></img>);
+  //     });
+
+  //     setImages(images);
+  //   } catch (err) {
+  //     return err;
+  //   }
+  // };
 
   // handle drag events
   const handleDrag = function (e) {
@@ -97,16 +93,11 @@ function ImageUpload() {
     //   console.log(pair[0]+ ' - ' + pair[1]);
     // }
     try {
-      await fetch(
-        `/api/images/upload-file-to-cloud-storage/${currentUser.email}`,
-        {
-          method: "POST",
-          // headers: {
-          //   'Content-Type': 'multipart/form-data'
-          // },
-          body: formData,
-        }
+      await axios.post(
+        `/api/images/upload-file-to-cloud-storage/${user_id}`,
+        formData
       );
+
       navigate("/dashboard");
     } catch (err) {
       console.log(err);
@@ -128,9 +119,11 @@ function ImageUpload() {
       </div>
     );
   });
+  console.log("preview: ", preview);
 
   return (
     <div>
+      {/* we can change this to upload a profile photo > multiple photo upload is not functional */}
       <label>Share the Moments from Your Outdoor Adventures!</label>
       <form
         encType="multipart/form-data"
