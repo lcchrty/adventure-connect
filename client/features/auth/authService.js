@@ -41,7 +41,7 @@ const login = async (userData) => {
 const logout = async () => {
   localStorage.clear();
   sessionStorage.clear();
-  const response = await axios.post("/api/logout");
+  const response = await axios.get("/api/logout");
   return response.data;
 };
 
