@@ -1,6 +1,7 @@
 const path = require("path");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const { SourceMapDevToolPlugin } = require("webpack");
+const Dotenv = require('dotenv-webpack')
 
 module.exports = {
   mode: process.env.NODE_ENV,
@@ -31,6 +32,7 @@ module.exports = {
     new SourceMapDevToolPlugin({
       filename: "[file].map",
     }),
+    new Dotenv()
   ],
   performance: {
     hints: false,
@@ -88,5 +90,11 @@ module.exports = {
   // ],
   resolve: {
     extensions: [".js", ".jsx"],
+    // To resolve os and crypto Error
+    fallback: {
+      os: false,
+      crypto: false,
+      dotenv: require.resolve("dotenv")
+    }
   },
 };
