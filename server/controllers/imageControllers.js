@@ -71,7 +71,7 @@ imageController.uploadImages = async (req, res, next) => {
             { new: true }
           );
           // res.locals.updatedUser = updatedUser;
-          // console.log("imageUrls: ", imageUrls);
+          console.log("imageUrls: ", imageUrls);
           res.locals.images = imageUrls;
         });
         // urls.push(publicUrl);

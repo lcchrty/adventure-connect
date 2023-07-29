@@ -97,7 +97,6 @@ function ImageUpload() {
         `/api/images/upload-file-to-cloud-storage/${user_id}`,
         formData
       );
-
       return navigate("/app/dashboard");
     } catch (err) {
       console.log(err);

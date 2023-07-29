@@ -11,7 +11,8 @@
     "test": "npm test",
     "build": "NODE_ENV=production webpack",
     "dev": "NODE_ENV=development concurrently \"nodemon --watch server ./server/server.js\" \"webpack serve --open\"",
-    "prod": "NODE_ENV=production webpack \"nodemon ./server/server.js\""
+    "prod": "NODE_ENV=production webpack \"nodemon ./server/server.js\"",
+    "cypress": "cypress open"
   },
   "repository": {
     "type": "git",
@@ -30,6 +31,7 @@
     "concurrently": "^8.2.0",
     "cross-env": "^7.0.3",
     "css-loader": "^6.8.1",
+    "cypress": "^12.17.2",
     "dotenv": "^16.3.1",
     "dotenv-webpack": "^8.0.1",
     "env": "^0.0.2",
