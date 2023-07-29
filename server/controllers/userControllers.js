@@ -1,6 +1,26 @@
-const Users = require("../models/userModel");
+const { createErr } = require("../utils/errorCreator");
+// const Images = require("../models/imageModel");
+require("dotenv").config();
+const bcrypt = require("bcrypt");
+const jwt = require('jsonwebtoken');
+require('dotenv').config;
+
+// const { Storage } = require("@google-cloud/storage");
+const { format } = require("util");
+const multer = require("multer");
+const nodemailer = require("nodemailer");
+const cookieParser = require('cookie-parser');
+
+const User = require("../models/userModel");
 
 const userController = {};
+
+// const cloudStorage = new Storage({
+//   keyFilename: `${__dirname}/../web-app-adventure-connect-39d349a3f0d5.json`,
+//   projectId: "web-app-adventure-connect",
+// });
+// const bucketName = "adventure-connect-image-bucket";
+// const bucket = cloudStorage.bucket(bucketName);
 
 //verifying user upon logging in, to be put in route for post to /api/login. if route is successful, redirect to show user page
 
@@ -8,79 +28,79 @@ userController.verifyLogin = async (req, res, next) => {
   const { email, password } = req.body;
 
   try {
-    //find a user that has a matching email and password
-    const user = await Users.findOne({ email, password });
+    const user = await User.findOne({ email });
 
-    const cookieHeaders = {
-      httpOnly: false,
-      overwrite: true,
-    };
-
-    if (user) {
-      console.log("successful log in");
-      //maybe just make a cookie for activities and zipcode? so don't have to query the database again later when finding similar users?
-      res.cookie("currentemail", user.email, cookieHeaders);
-      res.cookie("currentInterests", user.interests, cookieHeaders);
-      res.cookie("zipCode", user.zip_code, cookieHeaders);
-      res.locals.loginStatus = true;
+    if (user && (await user.comparePassword(password))) {
+  
+      res.locals.user = user;
+      //add something that adds the JWT here
+      const currentUser = { user: user._id};
+      const accessToken = jwt.sign(currentUser, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '1800s'});
+      res.locals.accessToken = accessToken;
+      res.cookie('access_token', accessToken, {
+        httpOnly: true, 
+        maxAge: 1800000, 
+        sameSite: 'lax',
+        path: '/',
+        secure: false,
+      });
       return next();
     } else {
-      // If the user is not found, send an error response
       res.status(401).json({ message: "Invalid login credentials!" });
     }
   } catch (error) {
-    // If an error occurs, send an error response
     return next(error);
   }
 };
 
 userController.createNewUser = async (req, res, next) => {
-  console.log("before inserting new document to db");
+  const { name, email, password, zipCode, interests, bio } = req.body;
 
-  const newUser = new Users({
-    name: req.body.name,
-    email: req.body.email,
-    password: req.body.password,
-    zipCode: req.body.zipCode,
-    interests: req.body.interests,
-    bio: req.body.bio,
-  });
-  console.log("made the document");
   try {
-    //save the new user to the database
-    const savedUser = await Users.create(newUser);
-    const cookieHeaders = {
-      httpOnly: false,
-      overwrite: true,
-    };
-    res.cookie("currentEmail", savedUser.email, cookieHeaders);
-    res.cookie("currentInterests", savedUser.interests, cookieHeaders);
-    res.cookie("zipCode", savedUser.zipCode, cookieHeaders);
+    const newUser = await User.create({
+      name,
+      email,
+      password,
+      zipCode,
+      interests,
+      bio,
+    });
 
-    console.log("saved the user to the db");
+    console.log("new user saved to database");
+    // console.log(newUser);
+
+    res.locals.user = newUser;
+
+    const currentUser = { user: newUser._id};
+    const accessToken = jwt.sign(currentUser, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '1800s'});
+    console.log(accessToken);
+    res.locals.accessToken = accessToken;
+    res.cookie('access_token', accessToken, {
+      httpOnly: true, 
+      maxAge: 1800000, 
+      sameSite: 'lax',
+      path: '/',
+      secure: false,
+    });
+
     return next();
   } catch (error) {
-    console.log(error);
-    next(error);
+    return next({ message: { err: "Email is already in use" } });
   }
 };
 
 userController.updateUser = async (req, res, next) => {
   try {
-    // grab email from the currentUser cookie
-    const email = req.cookies.currentemail;
-    //find document by email and update it with the values from req.body
-    const updatedUser = await Users.findOneAndUpdate({ email }, req.body, {
+    const { email } = req.body;
+    const updatedUser = await User.findOneAndUpdate({ email }, req.body, {
       new: true,
     });
 
     if (updatedUser) {
       console.log(updatedUser);
       res.status(200);
-      // Document found and updated successfully
     } else {
       console.log("User not found");
-      // No document with the specified email was found
     }
   } catch (error) {
     console.error(error);
@@ -88,31 +108,112 @@ userController.updateUser = async (req, res, next) => {
   return next();
 };
 
-userController.getProfiles = async (req, res, next) => {
+userController.addLikedUser = async (req, res, next) => {
   try {
-    //grab zipCode from the cookie and convert to number to match schema
-    const zipCode = Number(req.cookies.zipCode);
-    //grab interests from the cookie, parse it from JSON format
-    const interests = JSON.parse(req.cookies.currentInterests);
-
-    //find users with same zipcode and at least one interest in common
-    const users = await Users.find({
-      zip_code: zipCode,
-      interests: { $in: interests },
-    });
-
-    console.log(users);
-    // Array of users with matching zipCode and at least one common interest
-
-    res.status(200);
-    //store users on res.locals
-    res.locals.matchingUsers = users;
-  } catch (error) {
-    console.error(error);
-    // An error occurred while querying the database
-    res.status(500).json({ message: "Server error!" });
+    const { email, userId } = req.body;
+    const updatedUser = await User.findOneAndUpdate({ email }, 
+      {
+        $push: { iLiked: userId }
+      },
+      { new: true },
+    )
+    res.locals.updatedUser = updatedUser
+    return next();
+  } catch (err) {
+    console.log(err);
   }
-  return next();
+}
+
+userController.removeLikedUser = async (req, res, next) => {
+  try {
+    const { email, userId } = req.body;
+    const updatedUser = await User.findOneAndUpdate(
+      { email },
+      {
+        $pull: { iLiked: userId } // Use $pull to remove the userId from the iLiked array
+      },
+      { new: true }
+    );
+    res.locals.updatedUser = updatedUser;
+    return next();
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ message: "Internal server error" });
+  }
 };
 
+// verify user route to give information to state in the redux store
+userController.verifyUser = async (req, res, next) => {
+  const { user_id } = req.body;
+  const _id = user_id;
+  console.log(req.body);
+
+  try {
+    const user = await User.findOne({ _id });
+
+    if (user) {
+      // res.locals.loginStatus = true;
+      res.locals.user = user;
+      return next();
+    } else {
+      res.status(401).json({ message: "User not found!" });
+    }
+  } catch (error) {
+    return next(error);
+  }
+};
+
+userController.getProfiles = async (req, res, next) => {
+//grab id from req query params
+console.log('get profiles middleware ran, token authenticated');
+const userId = req.params.id;
+console.log('user id is', userId);
+
+try {
+  // try to find a user that has the id that's sent on the query
+  const currentUser = await User.findById(userId);
+  console.log('current user is', currentUser);
+ //send 404 if can't find current user in database 
+ if (!currentUser) {
+   return res.status(404).json({ error: 'User not found' });
+ }
+//grab that user's zipcode and interests and save them in variables 
+const zipCode = currentUser.zipCode;
+const interests = currentUser.interests;
+//grab all other user's with a different id, the same zipcode, and at least one activity in common 
+const users = await User.find({
+ //how to make sure different 
+ _id: { $ne: userId },
+ zipCode,
+ interests: { $in: interests },
+})
+//put similar users on res.locals
+res.locals.users = users;
+res.locals.currentUser = currentUser;
+console.log(users);
+return next();
+} catch (error) {
+console.error('Error finding similar users:', error);
+res.status(500).json({ error: 'Internal Server Error' });
+}
+};
+
+//then put this into every api route
+userController.authenticateToken = (req, res, next) => {
+  console.log('authenticate token middleware ran');
+  const token = req.cookies.access_token; // extract the token from cookies
+  console.log('token is', token)
+  console.log('token is', token)
+  if (token == null) return res.sendStatus(401);
+
+  jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
+    if (err) return res.sendStatus(403);
+    req.user = user;
+    next();
+  })
+
+}
+
 module.exports = userController;
+
+

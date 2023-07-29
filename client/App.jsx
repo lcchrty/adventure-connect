@@ -1,43 +1,50 @@
-import React from "react";
+import React, { useState } from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
-import Login from "./components/Login.jsx";
-import Signup from "./components/Signup.jsx";
-import PasswordReset from "./components/PasswordReset.jsx";
-import UserProfile from "./components/UserProfile.jsx";
-import SettingsBar from "./components/Settings.jsx";
-import EditProfile from "./components/EditProfile.jsx";
-import AccountInterests from "./components/AccountInterests.jsx";
-import AccountMgmt from "./components/AccountMgmt.jsx";
-import ChangePassword from "./components/ChangePassword.jsx";
-import Dashboard from "./components/Dashboard.jsx";
-import "./styles.css";
+import Login from "./components/auth-components/Login.jsx";
+import Signup from "./components/auth-components/Signup.jsx";
+import PasswordReset from "./components/auth-components/PasswordReset.jsx";
+import UserProfile from "./components/profile-components/UserProfile.jsx";
+import UserSpecific from "./components/profile-components/UserSpecific.jsx";
+import SettingsContainer from "./components/NavBar/Settings.jsx";
+import Dashboard from "./components/dashboard-components/Dashboard.jsx";
+import ImageUpload from "./components/dashboard-components/ImageUpload.jsx";
+import OTP from "./components/auth-components/OTP.jsx";
+import LikedUsers from "./components/dashboard-components/LikedUsers.jsx";
+import NavBar from "./components/NavBar/NavBar.jsx";
+import PrivateRoute from "./components/NavBar/PrivateRoute.jsx";
 
 const App = () => {
+  // const [email, setEmail] = useState("");
+  // const [otp, setOTP] = useState("");
+
   return (
     <div>
+      {/* <RecoveryContext.Provider value={{ otp, setOTP, email, setEmail }}> */}
       <BrowserRouter>
         <Routes>
-          {/* <Route index element={<SettingsBar />} /> this component needs to go somewhere */}
-          {/* <Route index element={<Login />} /> */}
           <Route path="/" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
-          <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/passwordreset" element={<PasswordReset />} />
-          <Route path="/userprofile" element={<UserProfile />} />
-          <Route path="/account" element={<EditProfile />} />
-          <Route path="/account/interests" element={<AccountInterests />} />
-          <Route path="/account/management" element={<AccountMgmt />} />
-          <Route path="/account/password" element={<ChangePassword />} />
+          <Route path="/app" element={<PrivateRoute />}>
+            <Route path="dashboard" element={<Dashboard />} />
+            <Route path="userprofile" element={<UserProfile />} />
+            <Route path="settings" element={<SettingsContainer />} />
+            <Route path="likedusers" element={<LikedUsers />} />
+            <Route path="userspecific" element={<UserSpecific />} />
+            <Route path="imageupload" element={<ImageUpload />} />
+            <Route path="otp" element={<OTP />} />
+          </Route>
+          {/* <Route path="/account/password" element={<ChangePassword />} /> */}
           <Route
             path="*"
             element={<div>404 Error. This page was not found</div>}
           />
         </Routes>
       </BrowserRouter>
+      {/* </RecoveryContext.Provider> */}
+      {/* <NavBar /> */}
     </div>
   );
 };
 
 export default App;
-
-//account
