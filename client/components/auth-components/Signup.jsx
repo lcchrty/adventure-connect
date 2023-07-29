@@ -27,16 +27,16 @@ const Signup = () => {
   const [bio, setBio] = useState("");
   const [error, setError] = useState("");
 
-  useEffect(() => {
-    //if there is an error we want to send an error message
-    if (isError) alert(message);
-    dispatch(reset());
-    // if sign up is successful (re: stgate updating) we want to send them on their way to dashboard
-    if (isSuccess || user) {
-      navigate("/app/dashboard");
-    }
-    dispatch(reset());
-  }, [user, isError, isSuccess, navigate, dispatch]);
+  // useEffect(() => {
+  //   //if there is an error we want to send an error message
+  //   if (isError) alert(message);
+  //   dispatch(reset());
+  //   // if sign up is successful (re: stgate updating) we want to send them on their way to dashboard
+  //   if (isSuccess || user) {
+  //     navigate("/app/dashboard");
+  //   }
+  //   dispatch(reset());
+  // }, [user, isError, isSuccess, navigate, dispatch]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -66,12 +66,13 @@ const Signup = () => {
 
     //updated by Julia
     dispatch(register(userInfo))
-    .then(() => {
-      navigate("/app/dashboard");
-    })
-    .catch((error) => {
-      console.error(error);
-    });
+      .unwrap()
+      .then(() => {
+        navigate("/app/imageupload");
+      })
+      .catch((error) => {
+        console.error(error);
+      });
 
     // try {
     //   // const res = await axios.post("/api/signup", userInfo);

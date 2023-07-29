@@ -62,10 +62,16 @@ imageController.uploadImages = async (req, res, next) => {
             `https://storage.googleapis.com/${bucket.name}/${blob.name}`
           );
           console.log("publicUrl: ", publicUrl);
-          const imageUrls = await Images.create({
-            user_id: user_id,
-            image: publicUrl,
-          });
+          const { user_id } = req.body;
+          const imageUrls = await User.findOneAndUpdate(
+            { user_id },
+            {
+              $push: { images: publicUrl },
+            },
+            { new: true }
+          );
+          // res.locals.updatedUser = updatedUser;
+          // console.log("imageUrls: ", imageUrls);
           res.locals.images = imageUrls;
         });
         // urls.push(publicUrl);
@@ -82,7 +88,7 @@ imageController.getImages = async (req, res, next) => {
   console.log("req.params: ", req.params);
   const user_id = req.params.user_id;
   try {
-    const image = await Images.find({ user_id: user_id });
+    const image = await Users.find({ user_id: user_id });
     // console.log('image',image[0].image);
     res.locals.images = image;
     return next();

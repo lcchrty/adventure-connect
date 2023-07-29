@@ -13,9 +13,9 @@ const getUser = async (user_id) => {
 
 const register = async (userData) => {
   const response = await axios.post(API_URL_SIGNUP, userData);
-  console.log("response.data: ", response.data.user._id);
+  // console.log("response.data: ", response.data._id);
   if (response.data) {
-    localStorage.setItem("user_id", JSON.stringify(response.data.user._id));
+    localStorage.setItem("user_id", JSON.stringify(response.data._id));
   }
   return response.data;
 };

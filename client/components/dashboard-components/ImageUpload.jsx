@@ -98,7 +98,7 @@ function ImageUpload() {
         formData
       );
 
-      navigate("/dashboard");
+      return navigate("/app/dashboard");
     } catch (err) {
       console.log(err);
       return alert("Issue uploading your images. Please try again later.");

@@ -20,29 +20,29 @@ const App = () => {
   return (
     <div>
       {/* <RecoveryContext.Provider value={{ otp, setOTP, email, setEmail }}> */}
-        <BrowserRouter>
-          <Routes>
+      <BrowserRouter>
+        <Routes>
           <Route path="/" element={<Login />} />
-         <Route path="/signup" element={<Signup />} />
+          <Route path="/signup" element={<Signup />} />
           <Route path="/passwordreset" element={<PasswordReset />} />
-             <Route path="/app" element={<PrivateRoute />}>
-               <Route path="dashboard" element={<Dashboard />} />
-                <Route path="userprofile" element={<UserProfile />} />
-               <Route path="settings" element={<SettingsContainer />} />
-              <Route path="likedusers" element={<LikedUsers />} />
-               <Route path="userspecific" element={<UserSpecific />} />
-              <Route path="imageupload" element={<ImageUpload />} />
-              <Route path="otp" element={<OTP />} />
-    </Route>
-           {/* <Route path="/account/password" element={<ChangePassword />} /> */}
-           <Route
-              path="*"
-              element={<div>404 Error. This page was not found</div>}
-            />
-          </Routes>
-        </BrowserRouter>
+          <Route path="/app" element={<PrivateRoute />}>
+            <Route path="dashboard" element={<Dashboard />} />
+            <Route path="userprofile" element={<UserProfile />} />
+            <Route path="settings" element={<SettingsContainer />} />
+            <Route path="likedusers" element={<LikedUsers />} />
+            <Route path="userspecific" element={<UserSpecific />} />
+            <Route path="imageupload" element={<ImageUpload />} />
+            <Route path="otp" element={<OTP />} />
+          </Route>
+          {/* <Route path="/account/password" element={<ChangePassword />} /> */}
+          <Route
+            path="*"
+            element={<div>404 Error. This page was not found</div>}
+          />
+        </Routes>
+      </BrowserRouter>
       {/* </RecoveryContext.Provider> */}
-      <NavBar />
+      {/* <NavBar /> */}
     </div>
   );
 };
