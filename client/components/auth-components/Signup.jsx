@@ -10,64 +10,8 @@ import { register, reset } from "../../features/auth/authSlice";
 import bg from "../../../styles/bg-photo3.jpeg";
 
 import SignupForm from "./SignupForm";
-import { LuBike } from "react-icons/lu";
-import { FaRunning, FaHiking } from "react-icons/fa";
-import {
-  GiCampingTent,
-  GiMountainClimbing,
-  GiCanoe,
-  GiRollerSkate,
-  GiRoad,
-  GiLightBackpack,
-} from "react-icons/gi";
-
-const list = [
-  {
-    label: "Backpacking",
-    value: "Backpacking",
-    icon: <GiLightBackpack size={20} className="text-blue-500" />,
-  },
-  {
-    label: "Camping",
-    value: "Camping",
-    icon: <GiCampingTent size={20} className="text-orange-500" />,
-  },
-  {
-    label: "Climbing",
-    value: "Climbing",
-    icon: <GiMountainClimbing size={20} className="text-red-500" />,
-  },
-  {
-    label: "Hiking",
-    value: "Hiking",
-    icon: <FaHiking size={20} className="text-green-500" />,
-  },
-  {
-    label: "Mountain Biking",
-    value: "Mountain Biking",
-    icon: <LuBike size={20} className="text-purple-500" />,
-  },
-  {
-    label: "Rafting",
-    value: "Rafting",
-    icon: <GiCanoe size={20} className="text-teal-500" />,
-  },
-  {
-    label: "Road Cycling",
-    value: "Road Cycling",
-    icon: <GiRoad size={20} className="text-indigo-500" />,
-  },
-  {
-    label: "Roller Skating",
-    value: "Roller Skating",
-    icon: <GiRollerSkate size={20} className="text-pink-500" />,
-  },
-  {
-    label: "Trail Running",
-    value: "Trail Running",
-    icon: <FaRunning size={20} className="text-sky-500" />,
-  },
-];
+import { GiLightBackpack } from "react-icons/gi";
+import list from "../data/list";
 
 const Signup = () => {
   const { user, user_id } = useSelector((state) => state.auth);
@@ -82,6 +26,17 @@ const Signup = () => {
   const [zipcode, setZipcode] = useState("");
   const [bio, setBio] = useState("");
   const [error, setError] = useState("");
+
+  useEffect(() => {
+    //if there is an error we want to send an error message
+    if (isError) alert(message);
+    dispatch(reset());
+    // if sign up is successful (re: stgate updating) we want to send them on their way to dashboard
+    if (isSuccess || user) {
+      navigate("/app/dashboard");
+    }
+    dispatch(reset());
+  }, [user, isError, isSuccess, navigate, dispatch]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -108,10 +63,15 @@ const Signup = () => {
       setZipcode("");
       return;
     }
-    // error handling needs to be updated -Chandler
 
-    dispatch(register(userInfo));
-    navigate("/dashboard");
+    //updated by Julia
+    dispatch(register(userInfo))
+    .then(() => {
+      navigate("/app/dashboard");
+    })
+    .catch((error) => {
+      console.error(error);
+    });
 
     // try {
     //   // const res = await axios.post("/api/signup", userInfo);
